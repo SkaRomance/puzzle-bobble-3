@@ -69,20 +69,63 @@ function drawGrid() {
     }
 }
 
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+function lightenColor(hex, percent) {
+    let rgb = hexToRgb(hex);
+    if(!rgb) return hex;
+    let r = Math.min(255, Math.floor(rgb.r + (255 - rgb.r) * (percent / 100)));
+    let g = Math.min(255, Math.floor(rgb.g + (255 - rgb.g) * (percent / 100)));
+    let b = Math.min(255, Math.floor(rgb.b + (255 - rgb.b) * (percent / 100)));
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+function darkenColor(hex, percent) {
+    let rgb = hexToRgb(hex);
+    if(!rgb) return hex;
+    let r = Math.max(0, Math.floor(rgb.r * (1 - percent / 100)));
+    let g = Math.max(0, Math.floor(rgb.g * (1 - percent / 100)));
+    let b = Math.max(0, Math.floor(rgb.b * (1 - percent / 100)));
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
 function drawBubble(x, y, color) {
+    ctx.save();
+    
+    // Drop shadow
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 4;
+    
     ctx.beginPath();
     ctx.arc(x, y, BUBBLE_RADIUS - 1, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.closePath();
     
-    // Highlight
+    // 3D Radial Gradient
+    const gradient = ctx.createRadialGradient(x - BUBBLE_RADIUS/3, y - BUBBLE_RADIUS/3, BUBBLE_RADIUS/10, x, y, BUBBLE_RADIUS);
+    gradient.addColorStop(0, lightenColor(color, 60));
+    gradient.addColorStop(0.3, color);
+    gradient.addColorStop(1, darkenColor(color, 50));
+    
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    ctx.closePath();
+    ctx.restore();
+    
+    // Glossy curved reflection
     ctx.beginPath();
-    ctx.arc(x - 5, y - 5, 4, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.ellipse(x - BUBBLE_RADIUS/3, y - BUBBLE_RADIUS/3, BUBBLE_RADIUS/2.5, BUBBLE_RADIUS/5, Math.PI / 4, 0, Math.PI * 2);
+    const gloss = ctx.createLinearGradient(x - BUBBLE_RADIUS/2, y - BUBBLE_RADIUS/2, x, y);
+    gloss.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+    gloss.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = gloss;
     ctx.fill();
     ctx.closePath();
 }
@@ -444,8 +487,51 @@ canvas.addEventListener('mousedown', () => {
     }
 });
 
+function draw3DBackground() {
+    // Cielo / Sfondo lontano
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    bgGradient.addColorStop(0, '#0a0a1a');
+    bgGradient.addColorStop(0.5, '#1a1a2e');
+    bgGradient.addColorStop(1, '#0f3460');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Pavimento 3D (Grid)
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2 + 50);
+    ctx.strokeStyle = 'rgba(0, 242, 254, 0.2)';
+    ctx.lineWidth = 1;
+    
+    // Punto di fuga (Vanishing point)
+    for (let i = -10; i <= 10; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * 30, 0);
+        ctx.lineTo(i * 150, canvas.height);
+        ctx.stroke();
+    }
+    
+    // Linee orizzontali in prospettiva
+    for (let i = 1; i <= 15; i++) {
+        ctx.beginPath();
+        let y = Math.pow(i, 1.8);
+        ctx.moveTo(-canvas.width, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+    }
+    
+    // Nebbia/Glow sul fondo
+    const floorGlow = ctx.createLinearGradient(0, 0, 0, 50);
+    floorGlow.addColorStop(0, 'rgba(15, 52, 96, 1)');
+    floorGlow.addColorStop(1, 'rgba(15, 52, 96, 0)');
+    ctx.fillStyle = floorGlow;
+    ctx.fillRect(-canvas.width, 0, canvas.width*2, 50);
+    
+    ctx.restore();
+}
+
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    draw3DBackground();
     update();
     drawGrid();
     drawCannon();
