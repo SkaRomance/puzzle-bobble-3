@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Bobble 3.0</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="320" height="480"></canvas>
+        <div id="ui">
+            <h1>Puzzle Bobble 3.0</h1>
+            <p>Score: <span id="score">0</span></p>
+            <p id="game-over" style="display:none; color:red; font-weight:bold;">GAME OVER</p>
+            <button id="restart-btn" style="display:none;" onclick="initGame()">Riavvia</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
