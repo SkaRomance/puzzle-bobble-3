@@ -89,13 +89,34 @@ function drawBubble(x, y, color) {
 
 function drawDragon(x, y, color, facingRight) {
     ctx.save();
+    
+    // Drop Shadow on Floor
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 22, 20, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
     ctx.translate(x, y);
     if (!facingRight) {
         ctx.scale(-1, 1);
     }
     
+    // Gradients
+    const darkColor = darkenColor(color, 40);
+    const lightColor = lightenColor(color, 40);
+    
+    const bodyGrad = ctx.createRadialGradient(-3, 5, 2, 0, 10, 15);
+    bodyGrad.addColorStop(0, lightColor);
+    bodyGrad.addColorStop(0.5, color);
+    bodyGrad.addColorStop(1, darkColor);
+    
+    const headGrad = ctx.createRadialGradient(2, -8, 2, 5, -5, 12);
+    headGrad.addColorStop(0, lightColor);
+    headGrad.addColorStop(0.6, color);
+    headGrad.addColorStop(1, darkColor);
+
     // Tail
-    ctx.fillStyle = color;
+    ctx.fillStyle = darkColor;
     ctx.beginPath();
     ctx.moveTo(-10, 10);
     ctx.lineTo(-25, 15);
@@ -105,16 +126,20 @@ function drawDragon(x, y, color, facingRight) {
     // Body
     ctx.beginPath();
     ctx.ellipse(0, 10, 15, 12, 0, 0, Math.PI * 2);
+    ctx.fillStyle = bodyGrad;
     ctx.fill();
     
     // Belly
-    ctx.fillStyle = '#FFE066';
+    const bellyGrad = ctx.createRadialGradient(3, 10, 2, 5, 12, 10);
+    bellyGrad.addColorStop(0, '#FFF5CC');
+    bellyGrad.addColorStop(1, '#FFCC00');
+    ctx.fillStyle = bellyGrad;
     ctx.beginPath();
     ctx.ellipse(5, 12, 8, 10, 0, 0, Math.PI * 2);
     ctx.fill();
     
     // Head
-    ctx.fillStyle = color;
+    ctx.fillStyle = headGrad;
     ctx.beginPath();
     ctx.arc(5, -5, 12, 0, Math.PI * 2);
     ctx.fill();
@@ -122,6 +147,12 @@ function drawDragon(x, y, color, facingRight) {
     // Snout
     ctx.beginPath();
     ctx.ellipse(12, -2, 8, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Snout highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.beginPath();
+    ctx.ellipse(15, -4, 3, 1.5, Math.PI/6, 0, Math.PI * 2);
     ctx.fill();
     
     // Eye
@@ -134,8 +165,17 @@ function drawDragon(x, y, color, facingRight) {
     ctx.arc(10, -8, 2, 0, Math.PI * 2);
     ctx.fill();
     
+    // Eye highlight
+    ctx.fillStyle = '#FFF';
+    ctx.beginPath();
+    ctx.arc(10.5, -9, 1, 0, Math.PI * 2);
+    ctx.fill();
+    
     // Spikes
-    ctx.fillStyle = '#FF3333';
+    const spikeGrad = ctx.createLinearGradient(-20, -20, 0, 10);
+    spikeGrad.addColorStop(0, '#FF6666');
+    spikeGrad.addColorStop(1, '#990000');
+    ctx.fillStyle = spikeGrad;
     ctx.beginPath();
     ctx.moveTo(-5, -12); ctx.lineTo(-10, -20); ctx.lineTo(-12, -10);
     ctx.moveTo(-10, -5); ctx.lineTo(-18, -10); ctx.lineTo(-15, 0);
@@ -143,12 +183,13 @@ function drawDragon(x, y, color, facingRight) {
     ctx.fill();
     
     // Arm
-    ctx.fillStyle = color;
+    ctx.fillStyle = lightColor;
     ctx.beginPath();
     ctx.ellipse(8, 8, 6, 3, Math.PI/4, 0, Math.PI * 2);
     ctx.fill();
     
     // Leg
+    ctx.fillStyle = darkColor;
     ctx.beginPath();
     ctx.ellipse(0, 20, 6, 4, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -165,6 +206,13 @@ function drawCannon() {
 
     // Draw cannon
     ctx.save();
+    
+    // Cannon Base Drop Shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.beginPath();
+    ctx.ellipse(canvas.width / 2, canvas.height - 5, 25, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.translate(canvas.width / 2, canvas.height);
     const angle = Math.atan2(mouseY - canvas.height, mouseX - canvas.width / 2);
     
@@ -180,12 +228,34 @@ function drawCannon() {
     }
     
     ctx.rotate(angle);
-    // Cannon barrel
-    ctx.fillStyle = '#666';
+    
+    // Cannon barrel (Cylinder 3D)
+    const barrelGrad = ctx.createLinearGradient(0, -10, 0, 10);
+    barrelGrad.addColorStop(0, '#888');
+    barrelGrad.addColorStop(0.2, '#ccc');
+    barrelGrad.addColorStop(0.5, '#555');
+    barrelGrad.addColorStop(1, '#222');
+    
+    ctx.fillStyle = barrelGrad;
     ctx.fillRect(0, -10, 40, 20);
-    ctx.strokeStyle = '#222';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(0, -10, 40, 20);
+    
+    // Muzzle highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.fillRect(38, -10, 2, 20);
+    
+    ctx.restore();
+    
+    // Cannon Base (Hemisphere 3D)
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height);
+    const baseGrad = ctx.createRadialGradient(-5, -5, 2, 0, 0, 20);
+    baseGrad.addColorStop(0, '#666');
+    baseGrad.addColorStop(1, '#111');
+    
+    ctx.fillStyle = baseGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, 20, Math.PI, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
 
     // Draw next bubble

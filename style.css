@@ -39,7 +39,7 @@ body {
 }
 
 canvas {
-    background: radial-gradient(circle at top, #2a2a4a 0%, #0a0a1a 100%);
+    background: transparent;
     display: block;
     border-right: 1px solid rgba(255,255,255,0.1);
 }
