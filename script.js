@@ -25,6 +25,7 @@ function initGame() {
     scoreEl.innerText = score;
     gameOverEl.style.display = 'none';
     restartBtn.style.display = 'none';
+    particleSystem.particles = [];
 
     // Fill top 4 rows
     for (let r = 0; r < 4; r++) {
@@ -167,11 +168,16 @@ function drawCannon() {
     ctx.translate(canvas.width / 2, canvas.height);
     const angle = Math.atan2(mouseY - canvas.height, mouseX - canvas.width / 2);
     
-    // Cannon base
-    ctx.fillStyle = '#444';
-    ctx.beginPath();
-    ctx.arc(0, 0, 20, 0, Math.PI * 2);
-    ctx.fill();
+    // Trajectory line
+    if (!currentBubble.moving && !isGameOver) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(angle) * canvas.height * 1.5, Math.sin(angle) * canvas.height * 1.5);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
     
     ctx.rotate(angle);
     // Cannon barrel
@@ -185,8 +191,8 @@ function drawCannon() {
     // Draw next bubble
     drawBubble(canvas.width / 2 - 40, canvas.height - 20, nextColor);
     ctx.fillStyle = '#fff';
-    ctx.font = '10px Arial';
-    ctx.fillText('Next', canvas.width / 2 - 50, canvas.height - 40);
+    ctx.font = '10px "Press Start 2P"';
+    ctx.fillText('Next', canvas.width / 2 - 65, canvas.height - 40);
 }
 
 function update() {
@@ -293,7 +299,12 @@ function checkMatches(r, c) {
     }
 
     if (match.length >= 3) {
-        match.forEach(p => grid[p.r][p.c] = null);
+        soundManager.playPop();
+        match.forEach(p => {
+            const pos = getGridPos(p.r, p.c);
+            particleSystem.createExplosion(pos.x, pos.y, grid[p.r][p.c]);
+            grid[p.r][p.c] = null;
+        });
         score += match.length * 10;
         scoreEl.innerText = score;
     }
@@ -324,6 +335,8 @@ function dropFloating() {
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
             if (grid[r][c] && !visited.has(`${r},${c}`)) {
+                const pos = getGridPos(r, c);
+                particleSystem.createExplosion(pos.x, pos.y, grid[r][c]);
                 grid[r][c] = null;
                 dropped++;
             }
@@ -331,12 +344,14 @@ function dropFloating() {
     }
     
     if (dropped > 0) {
+        soundManager.playPop();
         score += dropped * 20;
         scoreEl.innerText = score;
     }
 }
 
 function gameOver() {
+    if (!isGameOver) soundManager.playGameOver();
     isGameOver = true;
     gameOverEl.style.display = 'block';
     restartBtn.style.display = 'block';
@@ -350,6 +365,7 @@ canvas.addEventListener('mousemove', (e) => {
 
 canvas.addEventListener('mousedown', () => {
     if (!currentBubble.moving && !isGameOver) {
+        soundManager.playShoot();
         const angle = Math.atan2(mouseY - canvas.height, mouseX - canvas.width / 2);
         const speed = 10;
         currentBubble.dx = Math.cos(angle) * speed;
@@ -363,6 +379,10 @@ function gameLoop() {
     update();
     drawGrid();
     drawCannon();
+    
+    particleSystem.update();
+    particleSystem.draw(ctx);
+    
     if (currentBubble) {
         drawBubble(currentBubble.x, currentBubble.y, currentBubble.color);
     }
