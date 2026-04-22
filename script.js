@@ -191,7 +191,7 @@ function drawCannon() {
     // Draw next bubble
     drawBubble(canvas.width / 2 - 40, canvas.height - 20, nextColor);
     ctx.fillStyle = '#fff';
-    ctx.font = '10px "Press Start 2P"';
+    ctx.font = 'bold 14px "Nunito"';
     ctx.fillText('Next', canvas.width / 2 - 65, canvas.height - 40);
 }
 

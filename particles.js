@@ -34,11 +34,18 @@ class ParticleSystem {
     
     draw(ctx) {
         ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
         for (let p of this.particles) {
             ctx.globalAlpha = p.life;
             ctx.fillStyle = p.color;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Inner glow
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 0.4, 0, Math.PI * 2);
             ctx.fill();
         }
         ctx.restore();
