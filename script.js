@@ -86,13 +86,100 @@ function drawBubble(x, y, color) {
     ctx.closePath();
 }
 
+function drawDragon(x, y, color, facingRight) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (!facingRight) {
+        ctx.scale(-1, 1);
+    }
+    
+    // Tail
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(-10, 10);
+    ctx.lineTo(-25, 15);
+    ctx.lineTo(-10, 20);
+    ctx.fill();
+    
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(0, 10, 15, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Belly
+    ctx.fillStyle = '#FFE066';
+    ctx.beginPath();
+    ctx.ellipse(5, 12, 8, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Head
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(5, -5, 12, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Snout
+    ctx.beginPath();
+    ctx.ellipse(12, -2, 8, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Eye
+    ctx.fillStyle = '#FFF';
+    ctx.beginPath();
+    ctx.arc(8, -8, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(10, -8, 2, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Spikes
+    ctx.fillStyle = '#FF3333';
+    ctx.beginPath();
+    ctx.moveTo(-5, -12); ctx.lineTo(-10, -20); ctx.lineTo(-12, -10);
+    ctx.moveTo(-10, -5); ctx.lineTo(-18, -10); ctx.lineTo(-15, 0);
+    ctx.moveTo(-12, 5);  ctx.lineTo(-22, 5);   ctx.lineTo(-14, 12);
+    ctx.fill();
+    
+    // Arm
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.ellipse(8, 8, 6, 3, Math.PI/4, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Leg
+    ctx.beginPath();
+    ctx.ellipse(0, 20, 6, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+}
+
 function drawCannon() {
+    // Draw dragons
+    // Bub (Green) on the right of the cannon
+    drawDragon(canvas.width / 2 + 35, canvas.height - 25, '#00CC00', false);
+    // Bob (Blue) on the left holding the next bubble
+    drawDragon(canvas.width / 2 - 60, canvas.height - 25, '#0066FF', true);
+
+    // Draw cannon
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height);
     const angle = Math.atan2(mouseY - canvas.height, mouseX - canvas.width / 2);
+    
+    // Cannon base
+    ctx.fillStyle = '#444';
+    ctx.beginPath();
+    ctx.arc(0, 0, 20, 0, Math.PI * 2);
+    ctx.fill();
+    
     ctx.rotate(angle);
+    // Cannon barrel
     ctx.fillStyle = '#666';
     ctx.fillRect(0, -10, 40, 20);
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(0, -10, 40, 20);
     ctx.restore();
 
     // Draw next bubble
