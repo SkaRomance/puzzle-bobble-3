@@ -1,1 +1,15 @@
-.vercel
+# Test artifacts
+test_*.png
+test_*.py
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+package-lock.json

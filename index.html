@@ -12,6 +12,13 @@
         <div id="ui">
             <h1>Puzzle Bobble 3.0</h1>
             <p>Score: <span id="score">0</span></p>
+            <p class="hud-line">Level: <span id="level">1</span></p>
+            <p class="hud-line">Colpi: <span id="shots">6</span></p>
+            <p class="hud-line" id="combo-row" style="display:none;">Combo: <span id="combo">0</span></p>
+            <div class="hud-line preview-wrap">
+                <span>Prossimo</span>
+                <span id="next-color" class="bubble-preview"></span>
+            </div>
             <p id="game-over" style="display:none; color:red; font-weight:bold;">GAME OVER</p>
             <button id="restart-btn" style="display:none;" onclick="initGame()">Riavvia</button>
         </div>
